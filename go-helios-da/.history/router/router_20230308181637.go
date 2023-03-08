@@ -3,25 +3,17 @@ package router
 import (
 	"context"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"go-helios-da/resource"
 	"net"
 	"net/http"
 	"strings"
 	"time"
-
-	"github.com/gin-gonic/gin"
 )
 
 func Router(ctx context.Context) {
-	root := gin.Default()
-	root.Use(Core())
-
-	testGroup := root.Group("/test")
-	testGroup.Handle(http.MethodGet, "health", func(ctx *gin.Context) {
-		ctx.String(http.StatusOK, "ok")
-	})
-
-	root.Run(":9609")
+	router := gin.Default()
+	router.Use(Core())
 }
 
 func Core() gin.HandlerFunc {

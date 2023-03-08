@@ -21,7 +21,7 @@ func Router(ctx context.Context) {
 		ctx.String(http.StatusOK, "ok")
 	})
 
-	root.Run(":9609")
+	root.Run(":0920")
 }
 
 func Core() gin.HandlerFunc {

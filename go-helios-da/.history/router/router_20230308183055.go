@@ -18,10 +18,9 @@ func Router(ctx context.Context) {
 
 	testGroup := root.Group("/test")
 	testGroup.Handle(http.MethodGet, "health", func(ctx *gin.Context) {
+
 		ctx.String(http.StatusOK, "ok")
 	})
-
-	root.Run(":9609")
 }
 
 func Core() gin.HandlerFunc {
