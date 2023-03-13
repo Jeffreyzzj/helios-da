@@ -180,8 +180,13 @@ func getIndexInfo(ctx context.Context, conf config.IndexConf) (info IndexNeedInf
 		IndexConf: indexConf,
 	}
 
+	// 如果是网络文件，需要将文件下载到本地
+	if indexConf.IndexType == global.INDEX_RESOURCE_TYPE_NET {
+		// todo 目前仅支持将数据scp到机器上，后续支持上传或其他的网络方式
+	}
+
 	// 如果是本地json
-	if indexConf.IndexType == global.INDEX_RESOURCE_TYPE_LOCAL && indexConf.IndexFormat == global.INDEX_FORMAT_JSON {
+	/*if indexConf.IndexType == global.INDEX_RESOURCE_TYPE_LOCAL && indexConf.IndexFormat == global.INDEX_FORMAT_JSON {
 		//获得构建倒排的数据
 		data, err := readFileToJsonMap(conf.DataConf)
 		if nil != err {
@@ -190,6 +195,25 @@ func getIndexInfo(ctx context.Context, conf config.IndexConf) (info IndexNeedInf
 		}
 		resInfos.DataMap = data
 	} else if indexConf.IndexType == global.INDEX_RESOURCE_TYPE_LOCAL && indexConf.IndexFormat == global.INDEX_FORMAT_ARRAY {
+		//获得构建倒排的数据
+		arrList, err := readFileToStringList(ctx, conf.DataConf)
+		if nil != err {
+			err = fmt.Errorf("readFileToStringList has err %s", err.Error())
+			return IndexNeedInfo{}, err
+		}
+		for _, v := range arrList {
+			resInfos.DataList = append(resInfos.DataList, v)
+		}
+	}*/
+	if indexConf.IndexFormat == global.INDEX_FORMAT_JSON {
+		//获得构建倒排的数据
+		data, err := readFileToJsonMap(conf.DataConf)
+		if nil != err {
+			err = fmt.Errorf("readFileToJsonMap has err %s", err.Error())
+			return IndexNeedInfo{}, err
+		}
+		resInfos.DataMap = data
+	} else if indexConf.IndexFormat == global.INDEX_FORMAT_ARRAY {
 		//获得构建倒排的数据
 		arrList, err := readFileToStringList(ctx, conf.DataConf)
 		if nil != err {

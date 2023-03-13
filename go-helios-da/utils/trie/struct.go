@@ -13,6 +13,7 @@ type IndexConf struct {
 	IndexKey    string `toml:"index_key"`
 	IndexType   string `toml:"index_type"`
 	IndexFormat string `toml:"index_format"`
+	URL         string `toml:"url"`
 	Mini        [][]string
 }
 
