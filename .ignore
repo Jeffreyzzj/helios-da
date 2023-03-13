@@ -1,8 +1,8 @@
-./.idea
-./.idea/*
+.idea
+.idea/
 .idea/*
-./go-helios-da/.idea
-./go-helios-da/.idea/*
+go-helios-da/.idea
+go-helios-da/.idea/
 go-helios-da/.idea/*
 ./go-helios-da/.history
 ./go-helios-da/.history/*
