@@ -2,12 +2,15 @@ package app
 
 import (
 	"context"
+	"fmt"
+	"github.com/BurntSushi/toml"
+	"go-helios-da/config"
 	"go-helios-da/global"
 	"go-helios-da/resource"
-	"go-helios-da/utils/trie"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"os"
+	"time"
 )
 
 func InitApp(ctx context.Context) {
@@ -16,8 +19,34 @@ func InitApp(ctx context.Context) {
 	// 初始化用户日志
 	initUserLog(ctx)
 
+	// 初始化脚本
+	initShell(ctx)
+}
+
+func initShell(ctx context.Context) {
 	// 初始化倒排索引
-	trie.TrieRootInit(ctx)
+	initTrieTree(ctx)
+}
+
+// 初始化倒排索引
+func initTrieTree(ctx context.Context) {
+	go func() {
+		for {
+			err := resource.RESOURCE_TRIEROOT.TrieRootInit(ctx)
+			if nil != err {
+				fmt.Println("TrieRootInit has err %s", err.Error())
+				resource.LOGGER.Error(err.Error())
+			}
+
+			var tomlInfo config.TomlConfig
+			filePath := global.DA_CONF_PATH
+			if _, err = toml.DecodeFile(filePath, &tomlInfo); err != nil {
+				err = fmt.Errorf("read toml has err %s", err.Error())
+			}
+
+			time.Sleep(time.Duration(tomlInfo.HeliosInitConfig.UpdateTime) * time.Hour)
+		}
+	}()
 }
 
 // 初始化业务日志

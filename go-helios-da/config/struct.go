@@ -8,6 +8,7 @@ type TomlConfig struct {
 type HeliosInitConfig struct {
 	Title        string
 	IndexConfigs map[string]IndexConf `toml:"index_conf"`
+	UpdateTime   int                  `toml:"update_time"`
 }
 
 type IndexConf struct {
