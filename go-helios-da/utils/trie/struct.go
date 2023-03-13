@@ -10,14 +10,16 @@ type TrieTree struct {
 }
 
 type IndexConf struct {
-	IndexKey  string `toml:"index_key"`
-	IndexType string `toml:"index_type"`
-	Mini      [][]string
+	IndexKey    string `toml:"index_key"`
+	IndexType   string `toml:"index_type"`
+	IndexFormat string `toml:"index_format"`
+	Mini        [][]string
 }
 
 type IndexNeedInfo struct {
 	IndexConf
-	Data []map[string]interface{}
+	DataMap  []map[string]interface{}
+	DataList []string
 }
 
 var TrieRootMap *map[string]*TrieTree = &map[string]*TrieTree{}

@@ -1,8 +1,12 @@
 package trie
 
 import (
+	"bufio"
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
+	"os"
 )
 
 // 基础方法 索引index添加数据data
@@ -165,4 +169,41 @@ func getDataTrieTreeDFS(ctx context.Context, root *TrieTree, dfsList *[]*interfa
 		}
 	}
 	return
+}
+
+// 按行读取文件, json
+func readFileToStringList(ctx context.Context, path string) (list []string, err error) {
+	//获得构建倒排的数据
+	fileHanle, err := os.OpenFile(path, os.O_RDONLY, 0666)
+	if err != nil {
+		return list, err
+	}
+
+	defer fileHanle.Close()
+
+	reader := bufio.NewReader(fileHanle)
+
+	var results []string
+	// 按行处理txt
+	for {
+		line, _, err := reader.ReadLine()
+		if err == io.EOF {
+			break
+		}
+		results = append(results, string(line))
+	}
+	return results, nil
+}
+
+// 直接将数据全部读出来，数组array
+func readFileToJsonMap(path string) (dataMap []map[string]interface{}, err error) {
+	//获得构建倒排的数据
+	content, err := os.ReadFile(path)
+	if err != nil {
+		err = fmt.Errorf("read dataConf has err %s", err.Error())
+		return []map[string]interface{}{}, err
+	}
+	var data []map[string]interface{}
+	err = json.Unmarshal(content, &data)
+	return data, nil
 }
