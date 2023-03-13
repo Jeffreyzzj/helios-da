@@ -1,6 +1,7 @@
 title = "helios-root"
 [helios_init_config]
     title = "helios_init_conf"
+    update_time = 5
 [helios_init_config.index_conf]
     [helios_init_config.index_conf.music]
         conf = "./da_conf/search/music_download.conf"
