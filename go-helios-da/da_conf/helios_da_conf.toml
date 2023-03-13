@@ -3,8 +3,8 @@ title = "helios-root"
     title = "helios_init_conf"
 [helios_init_config.index_conf]
     [helios_init_config.index_conf.music]
-        conf = "./root_conf/search/music_download.conf"
-        data_conf = "./root_conf/search/music_download_data.conf"
+        conf = "./da_conf/search/music_download.conf"
+        data_conf = "./da_conf/search/music_download_data.conf"
     [helios_init_config.index_conf.test]
-        conf = "./root_conf/search/test_t.conf"
-        data_conf = "./root_conf/search/test_t_data.conf"
+        conf = "./da_conf/search/test_t.conf"
+        data_conf = "./da_conf/search/test_t_data.conf"

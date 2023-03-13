@@ -4,6 +4,7 @@ import (
 	"context"
 	"go-helios-da/global"
 	"go-helios-da/resource"
+	"go-helios-da/utils/trie"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"os"
@@ -15,6 +16,8 @@ func InitApp(ctx context.Context) {
 	// 初始化用户日志
 	initUserLog(ctx)
 
+	// 初始化倒排索引
+	trie.TrieRootInit(ctx)
 }
 
 // 初始化业务日志

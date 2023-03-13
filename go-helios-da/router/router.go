@@ -3,6 +3,7 @@ package router
 import (
 	"context"
 	"fmt"
+	"go-helios-da/controller"
 	"go-helios-da/resource"
 	"net"
 	"net/http"
@@ -16,10 +17,15 @@ func Router(ctx context.Context) {
 	root := gin.Default()
 	root.Use(Core())
 
-	testGroup := root.Group("/test")
-	testGroup.Handle(http.MethodGet, "health", func(ctx *gin.Context) {
+	root.Handle(http.MethodGet, "health", func(ctx *gin.Context) {
 		ctx.String(http.StatusOK, "ok")
 	})
+
+	helios := root.Group("helios")
+	helios.Handle(http.MethodGet, "/hasKey", controller.HeliosHasKey)
+	helios.Handle(http.MethodGet, "/getKey", controller.HeliosGetDataByKey)
+	helios.Handle(http.MethodGet, "sugQ", controller.HeliosSugQueryByIndexAndWord)
+	helios.Handle(http.MethodGet, "/sugData", controller.HeliosSugDataByIndexAndWord)
 
 	root.Run(":9609")
 }

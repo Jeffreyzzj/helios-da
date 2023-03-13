@@ -5,99 +5,164 @@ import (
 	"fmt"
 )
 
-func (t *TrieTreeDao) PopTrieRoot(ctx context.Context) *map[string]*TrieTree {
-	return TrieRootMap
-}
-
-func (t *TrieTreeDao) BuildTrieTreeBySet(ctx context.Context, index string, dataMap map[string][]interface{}) {
-	root := &TrieTree{
-		TrieMap: map[rune]*TrieTree{},
-		IsEnd:   false,
-		Data:    []*interface{}{},
-	}
-	for k, v := range dataMap {
-		//addTrieTreeNode(index, []rune(k), v)
-		addTrieTreeNodeByNewRoot(root, []rune(k), v)
-	}
-
+// 基础方法 索引index添加数据data
+func addTrieTreeNode(index string, word []rune, data []interface{}) {
 	if (*TrieRootMap)[index] == nil {
 		(*TrieRootMap)[index] = &TrieTree{
 			TrieMap: map[rune]*TrieTree{},
 		}
 	}
-	(*TrieRootMap)[index] = root
-	return
-}
+	root := (*TrieRootMap)[index]
 
-func (t *TrieTreeDao) BuildTrieTree(ctx context.Context, index string, word string, data []interface{}) {
-	// 获得当前索引的位置
-	//addTrieTreeNode(index, []rune(word), data)
-
-	root := &TrieTree{
-		TrieMap: map[rune]*TrieTree{},
-		IsEnd:   false,
-		Data:    []*interface{}{},
-	}
-	addTrieTreeNodeByNewRoot(root, []rune(word), data)
-
-	if (*TrieRootMap)[index] == nil {
-		(*TrieRootMap)[index] = &TrieTree{
-			TrieMap: map[rune]*TrieTree{},
+	for _, v := range word {
+		if _, ok := root.TrieMap[v]; !ok {
+			root.TrieMap[v] = &TrieTree{
+				TrieMap: map[rune]*TrieTree{},
+				IsEnd:   false,
+				Data:    nil,
+			}
 		}
+		root = root.TrieMap[v]
 	}
-	(*TrieRootMap)[index] = root
-	return
+	root.IsEnd = true
+	if root.Data == nil {
+		root.Data = []*interface{}{}
+	}
+	trieTreeData := []*interface{}{}
+	for i := 0; i < len(data); i++ {
+		trieTreeData = append(trieTreeData, &data[i])
+	}
+	root.Data = append(root.Data, trieTreeData...)
 }
 
-func (t *TrieTreeDao) KeyIsExistByIndex(ctx context.Context, index string, key string) (b bool, err error) {
-	node, err := getNodeByKey(ctx, index, []rune(key))
-	if nil != err {
-		err = fmt.Errorf("getNodeByKey key[%s] has err %s", key, err.Error())
-		return
-	} else if node == nil {
-		return false, nil
+// 基础方法 在新指针中添加数据data
+func addTrieTreeNodeByNewRoot(root *TrieTree, word []rune, data []interface{}) {
+
+	for _, v := range word {
+		if _, ok := root.TrieMap[v]; !ok {
+			root.TrieMap[v] = &TrieTree{
+				TrieMap: map[rune]*TrieTree{},
+				IsEnd:   false,
+				Data:    nil,
+			}
+		}
+		root = root.TrieMap[v]
 	}
-	return node.IsEnd, nil
+	root.IsEnd = true
+	if root.Data == nil {
+		root.Data = []*interface{}{}
+	}
+	trieTreeData := []*interface{}{}
+	for i := 0; i < len(data); i++ {
+		trieTreeData = append(trieTreeData, &data[i])
+	}
+	root.Data = append(root.Data, trieTreeData...)
 }
 
-func (t *TrieTreeDao) GetDataByKey(ctx context.Context, index string, key string) (data []interface{}, err error) {
-	node, err := getNodeByKey(ctx, index, []rune(key))
-	if nil != err {
-		err = fmt.Errorf("getNodeByKey key[%s] has err %s", key, err.Error())
+// 基础方法 根据key获得node
+func getNodeByKey(ctx context.Context, index string, words []rune) (node *TrieTree, err error) {
+	if (*TrieRootMap)[index] == nil {
+		err = fmt.Errorf("helios hasn't index[%s]", index)
 		return nil, err
-	} else if node == nil {
-		return nil, nil
 	}
-	resList := []interface{}{}
-	for _, v := range node.Data {
-		resList = append(resList, *v)
+	root := (*TrieRootMap)[index]
+
+	for _, v := range words {
+		if _, ok := root.TrieMap[v]; !ok {
+			return nil, nil
+		}
+		root = root.TrieMap[v]
 	}
-	return resList, nil
+
+	return root, nil
 }
 
-func (t *TrieTreeDao) SugQueryBySubWord(ctx context.Context, index, subQuery string, maxNum int) (list []string, err error) {
-	sugList, err := SugBySubWord(ctx, index, []rune(subQuery), maxNum)
-	if nil != err {
-		err = fmt.Errorf("SugBySubWord has error %s", err.Error())
+// 基础方法 在一个索引index中查找以subWord为开头的倒排索引
+func SugBySubWord(ctx context.Context, index string, words []rune, maxNum int) (list [][]rune, err error) {
+	if (*TrieRootMap)[index] == nil {
+		err = fmt.Errorf("helios hasn't index[%s]", index)
 		return list, err
 	}
-	for _, v := range sugList {
-		list = append(list, string(v))
+	root := (*TrieRootMap)[index]
+	// 找到当前的subWord节点
+	for _, v := range words {
+		if _, ok := root.TrieMap[v]; !ok {
+			return list, nil
+		}
+		root = root.TrieMap[v]
 	}
 
+	// 当前root为最后一个节点，开始查询当前节点下的完整倒排索引
+	dfsList := &[][]rune{}
+	TrieTreeDFS(ctx, root, words, dfsList, maxNum)
+
+	return *dfsList, nil
+}
+
+// 基础方法 在一个索引index中查找以subWord为开头的数据集
+func sugDataListBySubWord(ctx context.Context, index string, words []rune, maxNum int) (list []*interface{}, err error) {
+	if (*TrieRootMap)[index] == nil {
+		err = fmt.Errorf("helios hasn't index[%s]", index)
+		return list, err
+	}
+	root := (*TrieRootMap)[index]
+	// 找到当前的subWord节点
+	for _, v := range words {
+		if _, ok := root.TrieMap[v]; !ok {
+			return list, nil
+		}
+		root = root.TrieMap[v]
+	}
+
+	// 当前root为最后一个节点，开始查询当前节点下的完整倒排索引
+	dfsList := &[]*interface{}{}
+	getDataTrieTreeDFS(ctx, root, dfsList, maxNum)
+
+	return *dfsList, nil
+}
+
+func TrieTreeDFS(ctx context.Context, root *TrieTree, words []rune, dfsList *[][]rune, maxNum int) {
+
+	if root == nil {
+		return
+	} else if len(*dfsList) >= maxNum {
+		return
+	}
+
+	if root.IsEnd {
+		*dfsList = append(*dfsList, words)
+	}
+
+	for k, v := range root.TrieMap {
+		root = v
+		words = append(words, k)
+		TrieTreeDFS(ctx, v, words, dfsList, maxNum)
+		words = words[0 : len(words)-1]
+		if len(*dfsList) >= maxNum {
+			return
+		}
+	}
 	return
 }
 
-func (t *TrieTreeDao) SugDataListBySubWord(ctx context.Context, index, subQuery string, maxNum int) (dataList []interface{}, err error) {
-	datas, err := sugDataListBySubWord(ctx, index, []rune(subQuery), maxNum)
-	if nil != err {
-		err = fmt.Errorf("sugDataListBySubWord has err %s", err.Error())
+func getDataTrieTreeDFS(ctx context.Context, root *TrieTree, dfsList *[]*interface{}, maxNum int) {
+
+	if root == nil {
+		return
+	} else if len(*dfsList) >= maxNum {
 		return
 	}
-	// 处理数据，将数据丢出
-	dataList = []interface{}{}
-	for i := 0; i < len(datas); i++ {
-		dataList = append(dataList, *datas[i])
+
+	if root.IsEnd {
+		*dfsList = append(*dfsList, root.Data...)
 	}
-	return dataList, nil
+
+	for _, v := range root.TrieMap {
+		root = v
+		getDataTrieTreeDFS(ctx, v, dfsList, maxNum)
+		if len(*dfsList) >= maxNum {
+			return
+		}
+	}
+	return
 }
