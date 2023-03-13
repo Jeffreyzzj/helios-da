@@ -2,12 +2,10 @@ package trie
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/BurntSushi/toml"
 	"go-helios-da/config"
 	"go-helios-da/global"
-	"os"
 )
 
 func (t *TrieTreeUtil) PopTrieRoot(ctx context.Context) *map[string]*TrieTree {
@@ -17,7 +15,7 @@ func (t *TrieTreeUtil) PopTrieRoot(ctx context.Context) *map[string]*TrieTree {
 func (t *TrieTreeUtil) TrieRootInit(ctx context.Context) (err error) {
 	// 读取需要处理的conf文件
 	var indexConf config.TomlConfig
-	filePath := "./da_conf/helios_da_conf.toml"
+	filePath := global.DA_CONF_PATH
 	if _, err := toml.DecodeFile(filePath, &indexConf); err != nil {
 		err = fmt.Errorf("read toml has err %s", err.Error())
 		return err
@@ -125,6 +123,7 @@ func (t *TrieTreeUtil) SugDataListBySubWord(ctx context.Context, index, subQuery
 	return dataList, nil
 }
 
+// 建立倒排索引
 func buildIndexByIndexConf(ctx context.Context, conf config.IndexConf) (err error) {
 	indexInfoParams, err := getIndexInfo(ctx, conf)
 	if nil != err {
@@ -132,12 +131,25 @@ func buildIndexByIndexConf(ctx context.Context, conf config.IndexConf) (err erro
 		return err
 	}
 
+	miniIndexs := formatTrieTree(ctx, indexInfoParams.IndexFormat, indexInfoParams)
+
+	// 将数据加入倒排索引
+	BuildTrieTreeBySet(ctx, indexInfoParams.IndexKey, miniIndexs)
+
+	return err
+}
+
+// 建立倒排索引前，统一处理数据格式
+func formatTrieTree(ctx context.Context, formatType string, indexInfo IndexNeedInfo) (m map[string][]interface{}) {
 	miniIndexs := map[string][]interface{}{}
-	for _, miniList := range indexInfoParams.Mini {
-		// 本地文件
-		if indexInfoParams.IndexType == global.INDEX_TYPE_LOCAL {
-			for _, v := range indexInfoParams.Data {
-				miniIndex := ""
+	switch formatType {
+	case global.INDEX_FORMAT_JSON:
+		for _, v := range indexInfo.DataMap {
+			if v == nil {
+				break
+			}
+			miniIndex := ""
+			for _, miniList := range indexInfo.Mini {
 				for _, m := range miniList {
 					if _, ok := v[m]; !ok {
 						break
@@ -147,12 +159,13 @@ func buildIndexByIndexConf(ctx context.Context, conf config.IndexConf) (err erro
 				miniIndexs[miniIndex] = append(miniIndexs[miniIndex], v)
 			}
 		}
+		break
+	case global.INDEX_FORMAT_ARRAY:
+		for _, v := range indexInfo.DataList {
+			miniIndexs[v] = nil
+		}
 	}
-
-	// 将数据加入倒排索引
-	BuildTrieTreeBySet(ctx, indexInfoParams.IndexKey, miniIndexs)
-
-	return err
+	return miniIndexs
 }
 
 func getIndexInfo(ctx context.Context, conf config.IndexConf) (info IndexNeedInfo, err error) {
@@ -167,16 +180,25 @@ func getIndexInfo(ctx context.Context, conf config.IndexConf) (info IndexNeedInf
 		IndexConf: indexConf,
 	}
 
-	if indexConf.IndexType == global.INDEX_TYPE_LOCAL {
+	// 如果是本地json
+	if indexConf.IndexType == global.INDEX_RESOURCE_TYPE_LOCAL && indexConf.IndexFormat == global.INDEX_FORMAT_JSON {
 		//获得构建倒排的数据
-		content, err := os.ReadFile(conf.DataConf)
-		if err != nil {
-			err = fmt.Errorf("read dataConf has err %s", err.Error())
+		data, err := readFileToJsonMap(conf.DataConf)
+		if nil != err {
+			err = fmt.Errorf("readFileToJsonMap has err %s", err.Error())
 			return IndexNeedInfo{}, err
 		}
-		var dataList []map[string]interface{}
-		err = json.Unmarshal(content, &dataList)
-		resInfos.Data = dataList
+		resInfos.DataMap = data
+	} else if indexConf.IndexType == global.INDEX_RESOURCE_TYPE_LOCAL && indexConf.IndexFormat == global.INDEX_FORMAT_ARRAY {
+		//获得构建倒排的数据
+		arrList, err := readFileToStringList(ctx, conf.DataConf)
+		if nil != err {
+			err = fmt.Errorf("readFileToStringList has err %s", err.Error())
+			return IndexNeedInfo{}, err
+		}
+		for _, v := range arrList {
+			resInfos.DataList = append(resInfos.DataList, v)
+		}
 	}
 
 	return resInfos, nil
