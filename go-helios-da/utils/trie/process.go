@@ -2,167 +2,182 @@ package trie
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"github.com/BurntSushi/toml"
+	"go-helios-da/config"
+	"go-helios-da/global"
+	"os"
 )
 
-// 基础方法 索引index添加数据data
-func addTrieTreeNode(index string, word []rune, data []interface{}) {
+func (t *TrieTreeUtil) PopTrieRoot(ctx context.Context) *map[string]*TrieTree {
+	return TrieRootMap
+}
+
+func (t *TrieTreeUtil) TrieRootInit(ctx context.Context) (err error) {
+	// 读取需要处理的conf文件
+	var indexConf config.TomlConfig
+	filePath := "./da_conf/helios_da_conf.toml"
+	if _, err := toml.DecodeFile(filePath, &indexConf); err != nil {
+		err = fmt.Errorf("read toml has err %s", err.Error())
+		return err
+	}
+
+	// 取出IndexConfigs列表，开始准备构建相应的倒排索引
+	for _, v := range indexConf.HeliosInitConfig.IndexConfigs {
+		err = buildIndexByIndexConf(ctx, v)
+		if nil != err {
+			fmt.Println("BuildIndexByIndexConf key[%s] has err[%s]", v.Conf, err.Error())
+		}
+	}
+	return nil
+}
+
+func (t *TrieTreeUtil) BuildTrieTreeBySet(ctx context.Context, index string, dataMap map[string][]interface{}) {
+	root := &TrieTree{
+		TrieMap: map[rune]*TrieTree{},
+		IsEnd:   false,
+		Data:    []*interface{}{},
+	}
+	for k, v := range dataMap {
+		addTrieTreeNodeByNewRoot(root, []rune(k), v)
+	}
+
 	if (*TrieRootMap)[index] == nil {
 		(*TrieRootMap)[index] = &TrieTree{
 			TrieMap: map[rune]*TrieTree{},
 		}
 	}
-	root := (*TrieRootMap)[index]
-
-	for _, v := range word {
-		if _, ok := root.TrieMap[v]; !ok {
-			root.TrieMap[v] = &TrieTree{
-				TrieMap: map[rune]*TrieTree{},
-				IsEnd:   false,
-				Data:    nil,
-			}
-		}
-		root = root.TrieMap[v]
-	}
-	root.IsEnd = true
-	if root.Data == nil {
-		root.Data = []*interface{}{}
-	}
-	trieTreeData := []*interface{}{}
-	for i := 0; i < len(data); i++ {
-		trieTreeData = append(trieTreeData, &data[i])
-	}
-	root.Data = append(root.Data, trieTreeData...)
+	(*TrieRootMap)[index] = root
+	return
 }
 
-// 基础方法 在新指针中添加数据data
-func addTrieTreeNodeByNewRoot(root *TrieTree, word []rune, data []interface{}) {
+func (t *TrieTreeUtil) BuildTrieTree(ctx context.Context, index string, word string, data []interface{}) {
+	// 获得当前索引的位置
+	//addTrieTreeNode(index, []rune(word), data)
 
-	for _, v := range word {
-		if _, ok := root.TrieMap[v]; !ok {
-			root.TrieMap[v] = &TrieTree{
-				TrieMap: map[rune]*TrieTree{},
-				IsEnd:   false,
-				Data:    nil,
-			}
-		}
-		root = root.TrieMap[v]
+	root := &TrieTree{
+		TrieMap: map[rune]*TrieTree{},
+		IsEnd:   false,
+		Data:    []*interface{}{},
 	}
-	root.IsEnd = true
-	if root.Data == nil {
-		root.Data = []*interface{}{}
-	}
-	trieTreeData := []*interface{}{}
-	for i := 0; i < len(data); i++ {
-		trieTreeData = append(trieTreeData, &data[i])
-	}
-	root.Data = append(root.Data, trieTreeData...)
-}
+	addTrieTreeNodeByNewRoot(root, []rune(word), data)
 
-// 基础方法 根据key获得node
-func getNodeByKey(ctx context.Context, index string, words []rune) (node *TrieTree, err error) {
 	if (*TrieRootMap)[index] == nil {
-		err = fmt.Errorf("helios hasn't index[%s]", index)
+		(*TrieRootMap)[index] = &TrieTree{
+			TrieMap: map[rune]*TrieTree{},
+		}
+	}
+	(*TrieRootMap)[index] = root
+	return
+}
+
+func (t *TrieTreeUtil) KeyIsExistInIndex(ctx context.Context, index string, key string) (b bool, err error) {
+	node, err := getNodeByKey(ctx, index, []rune(key))
+	if nil != err {
+		err = fmt.Errorf("getNodeByKey key[%s] has err %s", key, err.Error())
+		return
+	} else if node == nil {
+		return false, nil
+	}
+	return node.IsEnd, nil
+}
+
+func (t *TrieTreeUtil) GetDataByKey(ctx context.Context, index string, key string) (data []interface{}, err error) {
+	node, err := getNodeByKey(ctx, index, []rune(key))
+	if nil != err {
+		err = fmt.Errorf("getNodeByKey key[%s] has err %s", key, err.Error())
 		return nil, err
+	} else if node == nil {
+		return nil, nil
 	}
-	root := (*TrieRootMap)[index]
-
-	for _, v := range words {
-		if _, ok := root.TrieMap[v]; !ok {
-			return nil, nil
-		}
-		root = root.TrieMap[v]
+	resList := []interface{}{}
+	for _, v := range node.Data {
+		resList = append(resList, *v)
 	}
-
-	return root, nil
+	return resList, nil
 }
 
-// 基础方法 在一个索引index中查找以subWord为开头的倒排索引
-func SugBySubWord(ctx context.Context, index string, words []rune, maxNum int) (list [][]rune, err error) {
-	if (*TrieRootMap)[index] == nil {
-		err = fmt.Errorf("helios hasn't index[%s]", index)
+func (t *TrieTreeUtil) SugQueryBySubWord(ctx context.Context, index, subQuery string, maxNum int) (list []string, err error) {
+	sugList, err := SugBySubWord(ctx, index, []rune(subQuery), maxNum)
+	if nil != err {
+		err = fmt.Errorf("SugBySubWord has error %s", err.Error())
 		return list, err
 	}
-	root := (*TrieRootMap)[index]
-	// 找到当前的subWord节点
-	for _, v := range words {
-		if _, ok := root.TrieMap[v]; !ok {
-			return list, nil
-		}
-		root = root.TrieMap[v]
+	for _, v := range sugList {
+		list = append(list, string(v))
 	}
 
-	// 当前root为最后一个节点，开始查询当前节点下的完整倒排索引
-	dfsList := &[][]rune{}
-	TrieTreeDFS(ctx, root, words, dfsList, maxNum)
-
-	return *dfsList, nil
-}
-
-// 基础方法 在一个索引index中查找以subWord为开头的数据集
-func sugDataListBySubWord(ctx context.Context, index string, words []rune, maxNum int) (list []*interface{}, err error) {
-	if (*TrieRootMap)[index] == nil {
-		err = fmt.Errorf("helios hasn't index[%s]", index)
-		return list, err
-	}
-	root := (*TrieRootMap)[index]
-	// 找到当前的subWord节点
-	for _, v := range words {
-		if _, ok := root.TrieMap[v]; !ok {
-			return list, nil
-		}
-		root = root.TrieMap[v]
-	}
-
-	// 当前root为最后一个节点，开始查询当前节点下的完整倒排索引
-	dfsList := &[]*interface{}{}
-	getDataTrieTreeDFS(ctx, root, dfsList, maxNum)
-
-	return *dfsList, nil
-}
-
-func TrieTreeDFS(ctx context.Context, root *TrieTree, midList []rune, dfsList *[][]rune, maxNum int) {
-
-	if root == nil {
-		return
-	} else if len(*dfsList) >= maxNum {
-		return
-	}
-
-	if root.IsEnd {
-		*dfsList = append(*dfsList, midList)
-	}
-
-	for k, v := range root.TrieMap {
-		root = v
-		midList = append(midList, k)
-		TrieTreeDFS(ctx, v, midList, dfsList, maxNum)
-		midList = midList[0 : len(midList)-1]
-		if len(*dfsList) >= maxNum {
-			return
-		}
-	}
 	return
 }
 
-func getDataTrieTreeDFS(ctx context.Context, root *TrieTree, dfsList *[]*interface{}, maxNum int) {
-
-	if root == nil {
-		return
-	} else if len(*dfsList) >= maxNum {
+func (t *TrieTreeUtil) SugDataListBySubWord(ctx context.Context, index, subQuery string, maxNum int) (dataList []interface{}, err error) {
+	datas, err := sugDataListBySubWord(ctx, index, []rune(subQuery), maxNum)
+	if nil != err {
+		err = fmt.Errorf("sugDataListBySubWord has err %s", err.Error())
 		return
 	}
+	// 处理数据，将数据丢出
+	dataList = []interface{}{}
+	for i := 0; i < len(datas); i++ {
+		dataList = append(dataList, *datas[i])
+	}
+	return dataList, nil
+}
 
-	if root.IsEnd {
-		*dfsList = append(*dfsList, root.Data...)
+func buildIndexByIndexConf(ctx context.Context, conf config.IndexConf) (err error) {
+	indexInfoParams, err := getIndexInfo(ctx, conf)
+	if nil != err {
+		err = fmt.Errorf("getIndexInfo has err %s ", err.Error())
+		return err
 	}
 
-	for _, v := range root.TrieMap {
-		root = v
-		getDataTrieTreeDFS(ctx, v, dfsList, maxNum)
-		if len(*dfsList) >= maxNum {
-			return
+	miniIndexs := map[string][]interface{}{}
+	for _, miniList := range indexInfoParams.Mini {
+		// 本地文件
+		if indexInfoParams.IndexType == global.INDEX_TYPE_LOCAL {
+			for _, v := range indexInfoParams.Data {
+				miniIndex := ""
+				for _, m := range miniList {
+					if _, ok := v[m]; !ok {
+						break
+					}
+					miniIndex = fmt.Sprintf("%s%s", miniIndex, v[m])
+				}
+				miniIndexs[miniIndex] = append(miniIndexs[miniIndex], v)
+			}
 		}
 	}
-	return
+
+	// 将数据加入倒排索引
+	BuildTrieTreeBySet(ctx, indexInfoParams.IndexKey, miniIndexs)
+
+	return err
+}
+
+func getIndexInfo(ctx context.Context, conf config.IndexConf) (info IndexNeedInfo, err error) {
+	//获得构建倒排的字段
+	var indexConf IndexConf
+	if _, err := toml.DecodeFile(conf.Conf, &indexConf); err != nil {
+		err = fmt.Errorf("read toml has err %s", err.Error())
+		return IndexNeedInfo{}, err
+	}
+
+	resInfos := IndexNeedInfo{
+		IndexConf: indexConf,
+	}
+
+	if indexConf.IndexType == global.INDEX_TYPE_LOCAL {
+		//获得构建倒排的数据
+		content, err := os.ReadFile(conf.DataConf)
+		if err != nil {
+			err = fmt.Errorf("read dataConf has err %s", err.Error())
+			return IndexNeedInfo{}, err
+		}
+		var dataList []map[string]interface{}
+		err = json.Unmarshal(content, &dataList)
+		resInfos.Data = dataList
+	}
+
+	return resInfos, nil
 }
