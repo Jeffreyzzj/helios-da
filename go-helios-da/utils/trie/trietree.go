@@ -82,7 +82,7 @@ func getNodeByKey(ctx context.Context, index string, words []rune) (node *TrieTr
 }
 
 // 基础方法 在一个索引index中查找以subWord为开头的倒排索引
-func SugBySubWord(ctx context.Context, index string, words []rune, maxNum int) (list [][]rune, err error) {
+func SugBySubWord(ctx context.Context, index string, words []rune, maxNum int) (list []string, err error) {
 	if (*TrieRootMap)[index] == nil {
 		err = fmt.Errorf("helios hasn't index[%s]", index)
 		return list, err
@@ -97,7 +97,7 @@ func SugBySubWord(ctx context.Context, index string, words []rune, maxNum int) (
 	}
 
 	// 当前root为最后一个节点，开始查询当前节点下的完整倒排索引
-	dfsList := &[][]rune{}
+	dfsList := &[]string{}
 	TrieTreeDFS(ctx, root, words, dfsList, maxNum)
 
 	return *dfsList, nil
@@ -125,7 +125,7 @@ func sugDataListBySubWord(ctx context.Context, index string, words []rune, maxNu
 	return *dfsList, nil
 }
 
-func TrieTreeDFS(ctx context.Context, root *TrieTree, words []rune, dfsList *[][]rune, maxNum int) {
+func TrieTreeDFS(ctx context.Context, root *TrieTree, words []rune, dfsList *[]string, maxNum int) {
 
 	if root == nil {
 		return
@@ -134,7 +134,7 @@ func TrieTreeDFS(ctx context.Context, root *TrieTree, words []rune, dfsList *[][
 	}
 
 	if root.IsEnd {
-		*dfsList = append(*dfsList, words)
+		*dfsList = append(*dfsList, string(words))
 	}
 
 	for k, v := range root.TrieMap {
