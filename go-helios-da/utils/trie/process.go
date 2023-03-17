@@ -148,8 +148,8 @@ func formatTrieTree(ctx context.Context, formatType string, indexInfo IndexNeedI
 			if v == nil {
 				break
 			}
-			miniIndex := ""
 			for _, miniList := range indexInfo.Mini {
+				miniIndex := ""
 				for _, m := range miniList {
 					if _, ok := v[m]; !ok {
 						break
