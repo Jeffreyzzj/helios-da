@@ -3,9 +3,10 @@ package trie
 import (
 	"context"
 	"fmt"
-	"github.com/BurntSushi/toml"
 	"go-helios-da/config"
 	"go-helios-da/global"
+
+	"github.com/BurntSushi/toml"
 )
 
 func (t *TrieTreeUtil) PopTrieRoot(ctx context.Context) *map[string]*TrieTree {
@@ -25,7 +26,7 @@ func (t *TrieTreeUtil) TrieRootInit(ctx context.Context) (err error) {
 	for _, v := range indexConf.HeliosInitConfig.IndexConfigs {
 		err = buildIndexByIndexConf(ctx, v)
 		if nil != err {
-			fmt.Println("BuildIndexByIndexConf key[%s] has err[%s]", v.Conf, err.Error())
+			fmt.Printf("BuildIndexByIndexConf key[%s] has err[%s] \n", v.Conf, err.Error())
 		}
 	}
 	return nil

@@ -2,10 +2,11 @@ package controller
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"go-helios-da/resource"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 func HeliosStart(ctx *gin.Context) {
@@ -72,7 +73,7 @@ func HeliosSugQueryByIndexAndWord(ctx *gin.Context) {
 	list, err := resource.RESOURCE_TRIEROOT.SugQueryBySubWord(ctx, index, key, maxNum)
 
 	if nil != err {
-		fmt.Println("SugQueryBySubWord has err : %s", err.Error())
+		fmt.Println(err.Error())
 		info := BuildErrResponse(ctx, nil, err)
 		ctx.JSON(http.StatusOK, info)
 		return
@@ -100,7 +101,7 @@ func HeliosSugDataByIndexAndWord(ctx *gin.Context) {
 
 	sugData, err := resource.RESOURCE_TRIEROOT.SugDataListBySubWord(ctx, key, word, maxNum)
 	if nil != err {
-		fmt.Println("SugDataListBySubWord has err : %s", err.Error())
+		fmt.Println(err.Error())
 		info := BuildErrResponse(ctx, nil, err)
 		ctx.JSON(http.StatusOK, info)
 		return

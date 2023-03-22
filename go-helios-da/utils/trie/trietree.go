@@ -207,7 +207,7 @@ func readFileToJsonMap(path string) (dataMap []map[string]interface{}, err error
 	}
 	var data []map[string]interface{}
 	err = json.Unmarshal(content, &data)
-	return data, nil
+	return data, err
 }
 
 /*func getFileFromNetByUrlGet(ctx context.Context, url string) {
