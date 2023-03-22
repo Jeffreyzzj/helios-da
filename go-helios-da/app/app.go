@@ -3,14 +3,15 @@ package app
 import (
 	"context"
 	"fmt"
-	"github.com/BurntSushi/toml"
 	"go-helios-da/config"
 	"go-helios-da/global"
 	"go-helios-da/resource"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 	"os"
 	"time"
+
+	"github.com/BurntSushi/toml"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 func InitApp(ctx context.Context) {
@@ -34,7 +35,7 @@ func initTrieTree(ctx context.Context) {
 		for {
 			err := resource.RESOURCE_TRIEROOT.TrieRootInit(ctx)
 			if nil != err {
-				fmt.Println("TrieRootInit has err %s", err.Error())
+				fmt.Printf("TrieRootInit has err %s \n", err.Error())
 				resource.LOGGER.Error(err.Error())
 			}
 
@@ -42,6 +43,7 @@ func initTrieTree(ctx context.Context) {
 			filePath := global.DA_CONF_PATH
 			if _, err = toml.DecodeFile(filePath, &tomlInfo); err != nil {
 				err = fmt.Errorf("read toml has err %s", err.Error())
+				fmt.Println(err)
 			}
 
 			time.Sleep(time.Duration(tomlInfo.HeliosInitConfig.UpdateTime) * time.Hour)
