@@ -27,6 +27,10 @@ func Router(ctx context.Context) {
 	helios.Handle(http.MethodGet, "sugQ", controller.HeliosSugQueryByIndexAndWord)
 	helios.Handle(http.MethodGet, "/sugData", controller.HeliosSugDataByIndexAndWord)
 
+	lru := helios.Group("lru")
+	lru.Handle(http.MethodGet, "/get", controller.LRUGetData)
+	lru.Handle(http.MethodGet, "/put", controller.LRUPutData)
+
 	root.Run(":9609")
 }
 
