@@ -3,12 +3,12 @@ module go-helios-da
 go 1.18
 
 require (
+	github.com/BurntSushi/toml v1.2.1
 	github.com/gin-gonic/gin v1.9.0
 	go.uber.org/zap v1.24.0
 )
 
 require (
-	github.com/BurntSushi/toml v1.2.1 // indirect
 	github.com/bytedance/sonic v1.8.0 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
