@@ -32,8 +32,8 @@ func GetAllByIndex(ctx context.Context, index string) (data interface{}, err err
 	return r.GetAllByIndex(ctx, index)
 }
 
-func GetLRUByKeyAndIndex(ctx context.Context, key, index string) (data interface{}, err error) {
-	return r.GetLRUByKeyAndIndex(ctx, key, index)
+func GetLRUByKeyAndIndex(ctx context.Context, index, key string) (data interface{}, err error) {
+	return r.GetLRUByKeyAndIndex(ctx, index, key)
 }
 
 func PutLRUByKeyAndIndex(ctx context.Context, index, key string, data interface{}) (err error) {
