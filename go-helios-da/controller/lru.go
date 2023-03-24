@@ -11,6 +11,16 @@ import (
 // lru方法不应当直接暴露接口，而是为基础工程的相关内容进行提速
 // 这里仅仅用来测试相关功能
 
+func LRUKeyAll(ctx *gin.Context) {
+	index := ctx.Query("index")
+	data, err := resource.RESOURCE_LRUROOT.GetAllByIndex(ctx, index)
+	if nil != err {
+		fmt.Printf("GetLRUByKeyAndIndex has err %s", err.Error())
+		return
+	}
+	ctx.JSON(http.StatusOK, data)
+}
+
 func LRUGetData(ctx *gin.Context) {
 	d := ctx.Query("d")
 	data, err := resource.RESOURCE_LRUROOT.GetLRUByKeyAndIndex(ctx, key, d)
