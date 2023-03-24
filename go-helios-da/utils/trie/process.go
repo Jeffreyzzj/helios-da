@@ -73,6 +73,7 @@ func (t *TrieTreeUtil) BuildTrieTree(ctx context.Context, index string, word str
 }
 
 func (t *TrieTreeUtil) KeyIsExistInIndex(ctx context.Context, index string, key string) (b bool, err error) {
+	//lru.GetLRUByKeyAndIndex(ctx, key, index)
 	node, err := getNodeByKey(ctx, index, []rune(key))
 	if nil != err {
 		err = fmt.Errorf("getNodeByKey key[%s] has err %s", key, err.Error())
