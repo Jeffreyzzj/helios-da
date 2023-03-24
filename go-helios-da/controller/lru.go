@@ -39,7 +39,7 @@ func LRUPutData(ctx *gin.Context) {
 
 	hasIndex := resource.RESOURCE_LRUROOT.LRUUtilHasIndex(ctx, key)
 	if !hasIndex {
-		resource.RESOURCE_LRUROOT.LRUInit(ctx, key)
+		resource.RESOURCE_LRUROOT.LRUInit(ctx, key, 5, 5)
 	}
 
 	err := resource.RESOURCE_LRUROOT.PutLRUByKeyAndIndex(ctx, key, d, ds)

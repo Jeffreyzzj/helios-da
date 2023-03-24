@@ -146,7 +146,6 @@ func TrieTreeDFS(ctx context.Context, root *TrieTree, words []rune, dfsList *[]s
 			return
 		}
 	}
-	return
 }
 
 func getDataTrieTreeDFS(ctx context.Context, root *TrieTree, dfsList *[]*interface{}, maxNum int) {
@@ -168,7 +167,6 @@ func getDataTrieTreeDFS(ctx context.Context, root *TrieTree, dfsList *[]*interfa
 			return
 		}
 	}
-	return
 }
 
 // 以下为文件处理，后续考虑换到别的文件 start
