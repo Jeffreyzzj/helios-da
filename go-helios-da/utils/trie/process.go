@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"go-helios-da/config"
 	"go-helios-da/global"
+	"go-helios-da/utils/lru"
 
 	"github.com/BurntSushi/toml"
 )
@@ -48,7 +49,7 @@ func (t *TrieTreeUtil) BuildTrieTreeBySet(ctx context.Context, index string, dat
 		}
 	}
 	(*TrieRootMap)[index] = root
-	return
+	//return
 }
 
 func (t *TrieTreeUtil) BuildTrieTree(ctx context.Context, index string, word string, data []interface{}) {
@@ -68,7 +69,7 @@ func (t *TrieTreeUtil) BuildTrieTree(ctx context.Context, index string, word str
 		}
 	}
 	(*TrieRootMap)[index] = root
-	return
+	//return
 }
 
 func (t *TrieTreeUtil) KeyIsExistInIndex(ctx context.Context, index string, key string) (b bool, err error) {
@@ -160,7 +161,6 @@ func formatTrieTree(ctx context.Context, formatType string, indexInfo IndexNeedI
 				miniIndexs[miniIndex] = append(miniIndexs[miniIndex], v)
 			}
 		}
-		break
 	case global.INDEX_FORMAT_ARRAY:
 		for _, v := range indexInfo.DataList {
 			miniIndexs[v] = nil
@@ -181,10 +181,17 @@ func getIndexInfo(ctx context.Context, conf config.IndexConf) (info IndexNeedInf
 		IndexConf: indexConf,
 	}
 
-	// 如果是网络文件，需要将文件下载到本地
-	if indexConf.IndexType == global.INDEX_RESOURCE_TYPE_NET {
-		// todo 目前仅支持将数据scp到机器上，后续支持上传或其他的网络方式
+	// 如果需要使用lru
+	if indexConf.LRUSize != 0 {
+		lru.LRUInit(ctx, indexConf.IndexKey, indexConf.LRUSize, indexConf.LRUTime)
 	}
+
+	// 如果是网络文件，需要将文件下载到本地
+	/*
+		if indexConf.IndexType == global.INDEX_RESOURCE_TYPE_NET {
+			// todo 目前仅支持将数据scp到机器上，后续支持上传或其他的网络方式
+		}
+	*/
 
 	// 如果是本地json
 	/*if indexConf.IndexType == global.INDEX_RESOURCE_TYPE_LOCAL && indexConf.IndexFormat == global.INDEX_FORMAT_JSON {
@@ -221,9 +228,10 @@ func getIndexInfo(ctx context.Context, conf config.IndexConf) (info IndexNeedInf
 			err = fmt.Errorf("readFileToStringList has err %s", err.Error())
 			return IndexNeedInfo{}, err
 		}
-		for _, v := range arrList {
+		/*for _, v := range arrList {
 			resInfos.DataList = append(resInfos.DataList, v)
-		}
+		}*/
+		resInfos.DataList = append(resInfos.DataList, arrList...)
 	}
 
 	return resInfos, nil

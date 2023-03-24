@@ -6,18 +6,22 @@ import (
 	"time"
 )
 
-func (r *LRUUtil) LRUInit(ctx context.Context, index string) (err error) {
+func (r *LRUUtil) LRUInit(ctx context.Context, index string, size, lruTime int) (err error) {
 	s := LRUNode{}
 	e := LRUNode{}
 	s.next = &e
 	e.pre = &s
+	if size == 0 {
+		size = 5
+	}
 	root := LRURoot{
 		head: &s,
 		tail: &e,
-		size: 5,
-		t:    5,
+		size: size,
+		t:    lruTime,
 		kMap: map[string]*LRUNode{},
 	}
+	fmt.Printf("LRUInit index_size_time:[%s_%d_%d]\n", index, size, lruTime)
 	// 将该root注册到LRU表
 	(*LruM)[index] = &root
 	return nil

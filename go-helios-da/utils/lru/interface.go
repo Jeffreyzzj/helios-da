@@ -3,7 +3,7 @@ package lru
 import "context"
 
 type LRUUtilInterface interface {
-	LRUInit(ctx context.Context, index string) (err error)
+	LRUInit(ctx context.Context, index string, size, lruTime int) (err error)
 	LRUUtilHasIndex(ctx context.Context, index string) (b bool)
 	GetAllByIndex(ctx context.Context, index string) (data interface{}, err error)
 	GetLRUByKeyAndIndex(ctx context.Context, index, key string) (data interface{}, err error)
@@ -20,8 +20,8 @@ func Register(m *LRUUtil) {
 	r = m
 }
 
-func LRUInit(ctx context.Context, index string) (err error) {
-	return r.LRUInit(ctx, index)
+func LRUInit(ctx context.Context, index string, size, lruTime int) (err error) {
+	return r.LRUInit(ctx, index, size, lruTime)
 }
 
 func LRUUtilHasIndex(ctx context.Context, index string) (b bool) {

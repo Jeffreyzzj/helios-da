@@ -14,6 +14,8 @@ type IndexConf struct {
 	IndexType   string `toml:"index_type"`
 	IndexFormat string `toml:"index_format"`
 	URL         string `toml:"url"`
+	LRUSize     int    `toml:"index_lru_size"`
+	LRUTime     int    `toml:"index_lru_time"`
 	Mini        [][]string
 }
 
