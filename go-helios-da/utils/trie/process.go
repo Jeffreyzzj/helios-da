@@ -116,6 +116,7 @@ func (t *TrieTreeUtil) SugQueryBySubWord(ctx context.Context, index, subQuery st
 		fmt.Printf("GetLRUByKeyAndIndex's data json to byte has err %s, \n", err.Error())
 	}
 
+	// 进行数据查询
 	sugList, err := SugBySubWord(ctx, index, []rune(subQuery), maxNum)
 	if nil != err {
 		err = fmt.Errorf("SugBySubWord has error %s", err.Error())
@@ -126,7 +127,10 @@ func (t *TrieTreeUtil) SugQueryBySubWord(ctx context.Context, index, subQuery st
 	}
 
 	// 保存lru
-	lru.PutLRUByKeyAndIndex(ctx, index, subQuery, sugList)
+	err = lru.PutLRUByKeyAndIndex(ctx, index, subQuery, sugList)
+	if nil != err {
+		fmt.Printf("PutLRUByKeyAndIndex %s", err.Error())
+	}
 
 	return
 }
