@@ -85,7 +85,7 @@
         王楚然
    ```
    
-1. 运行
+4. 运行
 + 源代码
   > - 方式一：在根目录下运行: go run main.go
   > - 方式二：修改 start.sh 进行启动
@@ -93,6 +93,48 @@
 + linux
   > - 方式一：执行 ./go-helios-da
   > - 方式二：修改 start.sh 进行启动
+
+5. 压测
++ mac版本压测 
+   ```
+    ab -n 16000 -c 200 -s 60 "http://127.0.0.1:9609/helios/sugQ?query=%E6%97%A9%E5%AE%89&index=test"
+
+    Server Software:
+    Server Hostname:        127.0.0.1
+    Server Port:            9609
+
+    Document Path:          /helios/sugQ?query=%E6%97%A9%E5%AE%89&index=test
+    Document Length:        61 bytes
+
+    Concurrency Level:      200
+    Time taken for tests:   2.100 seconds
+    Complete requests:      16000
+    Failed requests:        0
+    Total transferred:      8160000 bytes
+    HTML transferred:       976000 bytes
+    Requests per second:    7618.37 [#/sec] (mean)
+    Time per request:       26.252 [ms] (mean)
+    Time per request:       0.131 [ms] (mean, across all concurrent requests)
+    Transfer rate:          3794.30 [Kbytes/sec] received
+
+    Connection Times (ms)
+                  min  mean[+/-sd] median   max
+    Connect:        0    0   1.0      0      18
+    Processing:     0   26  12.8     25     117
+    Waiting:        0   25  12.7     25     117
+    Total:          0   26  12.7     25     117
+
+    Percentage of the requests served within a certain time (ms)
+      50%     25
+      66%     27
+      75%     29
+      80%     31
+      90%     40
+      95%     51
+      98%     58
+      99%     65
+      100%    117 (longest request)
+   ```
 
 ## 功能
 

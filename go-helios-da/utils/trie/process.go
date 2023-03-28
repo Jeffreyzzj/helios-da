@@ -102,18 +102,21 @@ func (t *TrieTreeUtil) GetDataByKey(ctx context.Context, index string, key strin
 func (t *TrieTreeUtil) SugQueryBySubWord(ctx context.Context, index, subQuery string, maxNum int) (list []string, err error) {
 	// 使用lru加速
 	data, err := lru.GetLRUByKeyAndIndex(ctx, index, subQuery)
+	lruFlag := true
 	if nil != err {
-		fmt.Printf("GetLRUByKeyAndIndex has err %s", err.Error())
+		//fmt.Printf("GetLRUByKeyAndIndex has err %s", err.Error())
+		// lru的err不应当影响sug
+		err, lruFlag = nil, false
 	} else if data != nil {
-		dBtyeList, err := json.Marshal(data)
-		if nil == err {
+		dBtyeList, errJson := json.Marshal(data)
+		if nil == errJson {
 			dataList := []string{}
-			err = json.Unmarshal(dBtyeList, &dataList)
-			if nil == err {
+			errJson = json.Unmarshal(dBtyeList, &dataList)
+			if nil == errJson {
 				return dataList, nil
 			}
 		}
-		fmt.Printf("GetLRUByKeyAndIndex's data json to byte has err %s, \n", err.Error())
+		fmt.Printf("GetLRUByKeyAndIndex's data json to byte has err %s, \n", errJson.Error())
 	}
 
 	// 进行数据查询
@@ -126,13 +129,14 @@ func (t *TrieTreeUtil) SugQueryBySubWord(ctx context.Context, index, subQuery st
 		list = append(list, string(v))
 	}
 
-	// 保存lru
-	err = lru.PutLRUByKeyAndIndex(ctx, index, subQuery, sugList)
-	if nil != err {
-		fmt.Printf("PutLRUByKeyAndIndex %s", err.Error())
+	if lruFlag {
+		// 保存lru
+		err = lru.PutLRUByKeyAndIndex(ctx, index, subQuery, sugList)
+		if nil != err {
+			//fmt.Printf("PutLRUByKeyAndIndex %s", err.Error())
+		}
 	}
-
-	return
+	return list, nil
 }
 
 func (t *TrieTreeUtil) SugDataListBySubWord(ctx context.Context, index, subQuery string, maxNum int) (dataList []interface{}, err error) {
