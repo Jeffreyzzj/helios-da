@@ -2,7 +2,6 @@ package trie
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"go-helios-da/config"
 	"go-helios-da/global"
@@ -99,7 +98,7 @@ func (t *TrieTreeUtil) GetDataByKey(ctx context.Context, index string, key strin
 	return resList, nil
 }
 
-func (t *TrieTreeUtil) SugQueryBySubWord(ctx context.Context, index, subQuery string, maxNum int) (list []string, err error) {
+func (t *TrieTreeUtil) SugQueryBySubWord(ctx context.Context, index, subQuery string, maxNum int) (l interface{}, err error) {
 	// 使用lru加速
 	data, err := lru.GetLRUByKeyAndIndex(ctx, index, subQuery)
 	lruFlag := true
@@ -108,7 +107,7 @@ func (t *TrieTreeUtil) SugQueryBySubWord(ctx context.Context, index, subQuery st
 		// lru的err不应当影响sug
 		err, lruFlag = nil, false
 	} else if data != nil {
-		dBtyeList, errJson := json.Marshal(data)
+		/*dBtyeList, errJson := json.Marshal(data)
 		if nil == errJson {
 			dataList := []string{}
 			errJson = json.Unmarshal(dBtyeList, &dataList)
@@ -116,15 +115,17 @@ func (t *TrieTreeUtil) SugQueryBySubWord(ctx context.Context, index, subQuery st
 				return dataList, nil
 			}
 		}
-		fmt.Printf("GetLRUByKeyAndIndex's data json to byte has err %s, \n", errJson.Error())
+		fmt.Printf("GetLRUByKeyAndIndex's data json to byte has err %s, \n", errJson.Error())*/
+		return data, nil
 	}
 
 	// 进行数据查询
 	sugList, err := SugBySubWord(ctx, index, []rune(subQuery), maxNum)
 	if nil != err {
 		err = fmt.Errorf("SugBySubWord has error %s", err.Error())
-		return list, err
+		return nil, err
 	}
+	list := []string{}
 	for _, v := range sugList {
 		list = append(list, string(v))
 	}
@@ -133,7 +134,7 @@ func (t *TrieTreeUtil) SugQueryBySubWord(ctx context.Context, index, subQuery st
 		// 保存lru
 		err = lru.PutLRUByKeyAndIndex(ctx, index, subQuery, sugList)
 		if nil != err {
-			//fmt.Printf("PutLRUByKeyAndIndex %s", err.Error())
+			fmt.Printf("PutLRUByKeyAndIndex %s", err.Error())
 		}
 	}
 	return list, nil

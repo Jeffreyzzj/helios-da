@@ -11,7 +11,7 @@ type TrieTreeDaoInterface interface {
 	// 查询某个索引是否存在
 	KeyIsExistInIndex(ctx context.Context, index string, key string) (b bool, err error)
 	GetDataByKey(ctx context.Context, index string, key string) (data []interface{}, err error)
-	SugQueryBySubWord(ctx context.Context, index, subQuery string, maxNum int) (list []string, err error)
+	SugQueryBySubWord(ctx context.Context, index, subQuery string, maxNum int) (list interface{}, err error)
 	SugDataListBySubWord(ctx context.Context, index, subQuery string, maxNum int) (dataList []interface{}, err error)
 }
 
@@ -50,7 +50,7 @@ func GetDataByKey(ctx context.Context, index string, key string) (data []interfa
 	return r.GetDataByKey(ctx, index, key)
 }
 
-func SugQueryBySubWord(ctx context.Context, index, subQuery string, maxNum int) (list []string, err error) {
+func SugQueryBySubWord(ctx context.Context, index, subQuery string, maxNum int) (list interface{}, err error) {
 	return r.SugQueryBySubWord(ctx, index, subQuery, maxNum)
 }
 
