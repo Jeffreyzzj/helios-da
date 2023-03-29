@@ -49,7 +49,6 @@ func (t *TrieTreeUtil) BuildTrieTreeBySet(ctx context.Context, index string, dat
 		}
 	}
 	(*TrieRootMap)[index] = root
-	//return
 }
 
 func (t *TrieTreeUtil) BuildTrieTree(ctx context.Context, index string, word string, data []interface{}) {
@@ -69,7 +68,7 @@ func (t *TrieTreeUtil) BuildTrieTree(ctx context.Context, index string, word str
 		}
 	}
 	(*TrieRootMap)[index] = root
-	//return
+
 }
 
 func (t *TrieTreeUtil) KeyIsExistInIndex(ctx context.Context, index string, key string) (b bool, err error) {
@@ -107,15 +106,6 @@ func (t *TrieTreeUtil) SugQueryBySubWord(ctx context.Context, index, subQuery st
 		// lru的err不应当影响sug
 		err, lruFlag = nil, false
 	} else if data != nil {
-		/*dBtyeList, errJson := json.Marshal(data)
-		if nil == errJson {
-			dataList := []string{}
-			errJson = json.Unmarshal(dBtyeList, &dataList)
-			if nil == errJson {
-				return dataList, nil
-			}
-		}
-		fmt.Printf("GetLRUByKeyAndIndex's data json to byte has err %s, \n", errJson.Error())*/
 		return data, nil
 	}
 
