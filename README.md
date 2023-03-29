@@ -135,6 +135,48 @@
       99%     65
       100%    117 (longest request)
    ```
++ linux版本压测(red hot: 4he)
+   ```
+    ab -n 16000 -c 200 -s 60 http://127.0.0.1:9609/helios/sugQ?query=%E6%9B%BE&index=test
+
+    Server Software:        
+    Server Hostname:        127.0.0.1
+    Server Port:            9609
+
+    Document Path:          /helios/sugQ?query=%E6%9B%BE
+    Document Length:        31 bytes
+
+    Concurrency Level:      200
+    Time taken for tests:   1.756 seconds
+    Complete requests:      16000
+    Failed requests:        0
+    Write errors:           0
+    Total transferred:      7680000 bytes
+    HTML transferred:       496000 bytes
+    Requests per second:    9109.94 [#/sec] (mean)
+    Time per request:       21.954 [ms] (mean)
+    Time per request:       0.110 [ms] (mean, across all concurrent requests)
+    Transfer rate:          4270.28 [Kbytes/sec] received
+
+    Connection Times (ms)
+                  min  mean[+/-sd] median   max
+    Connect:        0    4   2.5      4      15
+    Processing:     0   18  38.2      6     217
+    Waiting:        0   16  38.2      4     215
+    Total:          0   22  38.2     10     222
+
+    Percentage of the requests served within a certain time (ms)
+      50%     10
+      66%     12
+      75%     13
+      80%     14
+      90%     81
+      95%     120
+      98%     170
+      99%     213
+      100%    222 (longest request)
+   ```
+
 
 ## 功能
 
