@@ -32,6 +32,10 @@ func Router(ctx context.Context) {
 	lru.Handle(http.MethodGet, "/get", controller.LRUGetData)
 	lru.Handle(http.MethodGet, "/put", controller.LRUPutData)
 
+	if resource.RESOURCE_CONF.Port != "" {
+		root.Run(":" + resource.RESOURCE_CONF.Port)
+		return
+	}
 	root.Run(":9609")
 }
 
