@@ -3,11 +3,11 @@ package trie
 import (
 	"context"
 	"fmt"
+	"github.com/BurntSushi/toml"
 	"go-helios-da/config"
 	"go-helios-da/global"
 	"go-helios-da/utils/lru"
-
-	"github.com/BurntSushi/toml"
+	"strings"
 )
 
 func (t *TrieTreeUtil) PopTrieRoot(ctx context.Context) *map[string]*TrieTree {
@@ -152,7 +152,7 @@ func buildIndexByIndexConf(ctx context.Context, conf config.IndexConf) (err erro
 		return err
 	}
 
-	miniIndexs := formatTrieTree(ctx, indexInfoParams.IndexFormat, indexInfoParams)
+	miniIndexs := formatTrieTreeV2(ctx, indexInfoParams.IndexFormat, indexInfoParams)
 
 	// 将数据加入倒排索引
 	BuildTrieTreeBySet(ctx, indexInfoParams.IndexKey, miniIndexs)
@@ -165,7 +165,7 @@ func formatTrieTree(ctx context.Context, formatType string, indexInfo IndexNeedI
 	miniIndexs := map[string][]interface{}{}
 	switch formatType {
 	case global.INDEX_FORMAT_JSON:
-		for _, v := range indexInfo.DataMap {
+		for _, v := range indexInfo.DataMaps {
 			if v == nil {
 				break
 			}
@@ -178,6 +178,56 @@ func formatTrieTree(ctx context.Context, formatType string, indexInfo IndexNeedI
 					miniIndex = fmt.Sprintf("%s%s", miniIndex, v[m])
 				}
 				miniIndexs[miniIndex] = append(miniIndexs[miniIndex], v)
+			}
+		}
+	case global.INDEX_FORMAT_ARRAY:
+		for _, v := range indexInfo.DataList {
+			miniIndexs[v] = nil
+		}
+	}
+	return miniIndexs
+}
+
+// 建立倒排索引前，统一处理数据格式
+func formatTrieTreeV2(ctx context.Context, formatType string, indexInfo IndexNeedInfo) (m map[string][]interface{}) {
+	miniIndexs := map[string][]interface{}{}
+	switch formatType {
+	case global.INDEX_FORMAT_JSON:
+		for _, v := range indexInfo.DataMaps {
+			if v == nil {
+				break
+			}
+			for _, miniList := range indexInfo.Mini {
+				miniMidList := []interface{}{}
+				for _, m := range miniList {
+					if _, ok := v[m]; !ok {
+						break
+					}
+					dataList := []string{fmt.Sprintf("%v", v[m])}
+					if splitSign, ok := indexInfo.Split[m]; ok {
+						dataList = strings.Split(fmt.Sprintf("%s", v[m]), splitSign)
+					}
+
+					if len(miniMidList) == 0 {
+						for _, mmmV := range dataList {
+							miniMidList = append(miniMidList, mmmV)
+						}
+						continue
+					}
+
+					miniMmidList := []interface{}{}
+					for _, dataMid := range miniMidList {
+						for _, v := range dataList {
+							vvMid := fmt.Sprintf("%s%s", dataMid, v)
+							miniMmidList = append(miniMmidList, vvMid)
+						}
+					}
+					miniMidList = miniMmidList
+				}
+				for _, miniMid := range miniMidList {
+					miniKey := fmt.Sprintf("%v", miniMid)
+					miniIndexs[miniKey] = append(miniIndexs[miniKey], &v)
+				}
 			}
 		}
 	case global.INDEX_FORMAT_ARRAY:
@@ -220,7 +270,7 @@ func getIndexInfo(ctx context.Context, conf config.IndexConf) (info IndexNeedInf
 			err = fmt.Errorf("readFileToJsonMap has err %s", err.Error())
 			return IndexNeedInfo{}, err
 		}
-		resInfos.DataMap = data
+		resInfos.DataMaps = data
 	} else if indexConf.IndexType == global.INDEX_RESOURCE_TYPE_LOCAL && indexConf.IndexFormat == global.INDEX_FORMAT_ARRAY {
 		//获得构建倒排的数据
 		arrList, err := readFileToStringList(ctx, conf.DataConf)
@@ -239,7 +289,7 @@ func getIndexInfo(ctx context.Context, conf config.IndexConf) (info IndexNeedInf
 			err = fmt.Errorf("readFileToJsonMap has err %s", err.Error())
 			return IndexNeedInfo{}, err
 		}
-		resInfos.DataMap = data
+		resInfos.DataMaps = data
 	} else if indexConf.IndexFormat == global.INDEX_FORMAT_ARRAY {
 		//获得构建倒排的数据
 		arrList, err := readFileToStringList(ctx, conf.DataConf)

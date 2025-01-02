@@ -21,13 +21,13 @@ func Router(ctx context.Context) {
 		ctx.String(http.StatusOK, "ok")
 	})
 
-	helios := root.Group("helios")
+	helios := root.Group("/helios")
 	helios.Handle(http.MethodGet, "/hasKey", controller.HeliosHasKey)
 	helios.Handle(http.MethodGet, "/getKey", controller.HeliosGetDataByKey)
-	helios.Handle(http.MethodGet, "sugQ", controller.HeliosSugQueryByIndexAndWord)
+	helios.Handle(http.MethodGet, "/sugQ", controller.HeliosSugQueryByIndexAndWord)
 	helios.Handle(http.MethodGet, "/sugData", controller.HeliosSugDataByIndexAndWord)
 
-	lru := helios.Group("lru")
+	lru := helios.Group("/lru")
 	lru.Handle(http.MethodGet, "/keyAll", controller.LRUKeyAll)
 	lru.Handle(http.MethodGet, "/get", controller.LRUGetData)
 	lru.Handle(http.MethodGet, "/put", controller.LRUPutData)
