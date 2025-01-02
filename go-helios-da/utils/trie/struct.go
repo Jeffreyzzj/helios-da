@@ -17,11 +17,12 @@ type IndexConf struct {
 	LRUSize     int    `toml:"index_lru_size"`
 	LRUTime     int    `toml:"index_lru_time"`
 	Mini        [][]string
+	Split       map[string]string `toml:"split"`
 }
 
 type IndexNeedInfo struct {
 	IndexConf
-	DataMap  []map[string]interface{}
+	DataMaps []map[string]interface{}
 	DataList []string
 }
 

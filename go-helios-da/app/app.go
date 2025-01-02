@@ -15,6 +15,8 @@ import (
 )
 
 func InitApp(ctx context.Context) {
+	initConf(ctx)
+
 	// 初始化业务日志
 	initLog(ctx)
 	// 初始化用户日志
@@ -22,6 +24,18 @@ func InitApp(ctx context.Context) {
 
 	// 初始化脚本
 	initShell(ctx)
+}
+
+func initConf(ctx context.Context) (err error) {
+	var tomlInfo config.TomlConfig
+	filePath := global.DA_CONF_PATH
+	if _, err = toml.DecodeFile(filePath, &tomlInfo); err != nil {
+		fmt.Print(err.Error())
+		err = fmt.Errorf("read toml has err %s", err.Error())
+		panic(err)
+	}
+	resource.RESOURCE_CONF = &tomlInfo
+	return nil
 }
 
 func initShell(ctx context.Context) {
@@ -39,14 +53,7 @@ func initTrieTree(ctx context.Context) {
 				resource.LOGGER.Error(err.Error())
 			}
 
-			var tomlInfo config.TomlConfig
-			filePath := global.DA_CONF_PATH
-			if _, err = toml.DecodeFile(filePath, &tomlInfo); err != nil {
-				err = fmt.Errorf("read toml has err %s", err.Error())
-				fmt.Println(err)
-			}
-
-			time.Sleep(time.Duration(tomlInfo.HeliosInitConfig.UpdateTime) * time.Hour)
+			time.Sleep(time.Duration(resource.RESOURCE_CONF.HeliosInitConfig.UpdateTime) * time.Hour)
 		}
 	}()
 }

@@ -1,4 +1,5 @@
 title = "helios-root"
+port = "10010"
 [helios_init_config]
     title = "helios_init_conf"
     update_time = 5
