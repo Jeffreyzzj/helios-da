@@ -3,6 +3,7 @@ package config
 type TomlConfig struct {
 	Title            string
 	Port             string           `toml:"port"`
+	LogInfoPath      string           `toml:"log_level_info"`
 	HeliosInitConfig HeliosInitConfig `toml:"helios_init_config"`
 }
 

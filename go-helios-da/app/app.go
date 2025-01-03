@@ -61,7 +61,11 @@ func initTrieTree(ctx context.Context) {
 // 初始化业务日志
 func initLog(ctx context.Context) {
 	encoder := getEncoder()
-	file, _ := os.OpenFile(global.LOG_INFO_FILE, os.O_CREATE|os.O_APPEND|os.O_RDWR, os.ModePerm)
+	filePath := resource.RESOURCE_CONF.LogInfoPath
+	if filePath == "" {
+		filePath = global.LOG_INFO_FILE
+	}
+	file, _ := os.OpenFile(filePath, os.O_CREATE|os.O_APPEND|os.O_RDWR, os.ModePerm)
 	sync := getWriteSync(file)
 	core := zapcore.NewCore(encoder, sync, zapcore.InfoLevel)
 	resource.LOGGER = zap.New(core).Sugar()
