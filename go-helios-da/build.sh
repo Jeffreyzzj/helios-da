@@ -17,7 +17,7 @@ if [ -d "./da_conf" ]; then
     # 打包成 tar.gz
     mkdir log
     tar -czvf helios-da.tar.gz helios-da-linux helios-da-windows.exe helios-da-macos da_conf log
-    rm helios-da-linux helios-da-macos helios-da-windows.exe
+    rm -rf log helios-da-linux helios-da-macos helios-da-windows.exe
     #rm helios-da-windows.exe
     #rm helios-da-macos
     #rm -rf log
