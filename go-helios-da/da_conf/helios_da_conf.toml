@@ -1,5 +1,6 @@
 title = "helios-root"
 port = "10010"
+log_level_info = "./log/go_helios_da.log"
 [helios_init_config]
     title = "helios_init_conf"
     update_time = 5

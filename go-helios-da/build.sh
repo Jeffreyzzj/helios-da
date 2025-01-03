@@ -15,10 +15,12 @@ GOOS=darwin GOARCH=amd64 go build -o helios-da-macos main.go
 # 检查 da_conf 文件是否存在
 if [ -d "./da_conf" ]; then
     # 打包成 tar.gz
-    tar -czvf helios-da.tar.gz helios-da-linux helios-da-windows.exe helios-da-macos da_conf
-    rm helios-da-linux
-    rm helios-da-windows.exe
-    rm helios-da-macos
+    mkdir log
+    tar -czvf helios-da.tar.gz helios-da-linux helios-da-windows.exe helios-da-macos da_conf log
+    rm -rf log helios-da-linux helios-da-macos helios-da-windows.exe
+    #rm helios-da-windows.exe
+    #rm helios-da-macos
+    #rm -rf log
 else
     echo "da_conf file not found."
     exit 1
