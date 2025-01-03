@@ -20,9 +20,11 @@
    4. 执行以下命令，进行检查和更新适合自己机器的相关配置。
     > + go mod tidy
 + 可执行文件
-   1. linux:
-   2. mac:
-   3. windows:
+   1. linux: 请关注release版本 https://github.com/Jeffreyzzj/helios-da/tags
+   2. mac: 请关注release版本 https://github.com/Jeffreyzzj/helios-da/tags
+   3. windows: 请关注release版本 https://github.com/Jeffreyzzj/helios-da/tags
+   > + 以下版本为初版-预发布版本（时间：20250103，版本号：v_0.0.1_pre_20250103）
+   > + https://github.com/Jeffreyzzj/helios-da/releases/download/v_0.0.1_pre_20250103/helios-da.tar.gz
 
 ## 使用
 1. 配置helios-da，配置文件在根目录：

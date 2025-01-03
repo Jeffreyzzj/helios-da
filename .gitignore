@@ -1,3 +1,7 @@
 .idea
 go-helios-da/.idea
+go-helios-da/helios-da-linux
+go-helios-da/helios-da-windows.exe
+go-helios-da/helios-da-macos
+go-helios-da/helios-da.tar.gz
 ./go-helios-da/.history
