@@ -48,8 +48,8 @@ func initTrieTree(ctx context.Context) {
 		for {
 			err := resource.RESOURCE_TRIEROOT.TrieRootInit(ctx)
 			if nil != err {
-				fmt.Printf("TrieRootInit has err %s \n", err.Error())
-				resource.LOGGER.Error(err.Error())
+				err = fmt.Errorf("TrieRootInit has err %s \n", err.Error())
+				resource.LOGGER.Error("TrieRootInit has err ", zap.Error(err))
 			}
 
 			time.Sleep(time.Duration(resource.RESOURCE_CONF.HeliosInitConfig.UpdateTime) * time.Hour)

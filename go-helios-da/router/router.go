@@ -17,9 +17,7 @@ func Router(ctx context.Context) {
 	root := gin.Default()
 	root.Use(Core())
 
-	root.Handle(http.MethodGet, "health", func(ctx *gin.Context) {
-		ctx.String(http.StatusOK, "ok")
-	})
+	root.Handle(http.MethodGet, "/health", controller.HeliosHealth)
 
 	helios := root.Group("/helios")
 	helios.Handle(http.MethodGet, "/hasKey", controller.HeliosHasKey)
@@ -32,7 +30,9 @@ func Router(ctx context.Context) {
 	lru.Handle(http.MethodGet, "/get", controller.LRUGetData)
 	lru.Handle(http.MethodGet, "/put", controller.LRUPutData)
 
+	// 打印艺术字
 	artPrint()
+
 	if resource.RESOURCE_CONF.Port != "" {
 		root.Run(":" + resource.RESOURCE_CONF.Port)
 		return

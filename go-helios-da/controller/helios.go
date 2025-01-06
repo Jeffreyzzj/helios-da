@@ -3,14 +3,14 @@ package controller
 import (
 	"fmt"
 	"go-helios-da/resource"
+	"go.uber.org/zap"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-func HeliosStart(ctx *gin.Context) {
-	//helios.InitHeliosIndexList(ctx)
+func HeliosHealth(ctx *gin.Context) {
 	ctx.String(http.StatusOK, "ok")
 }
 
@@ -26,7 +26,7 @@ func HeliosHasKey(ctx *gin.Context) {
 	}
 	isExist, err := resource.RESOURCE_TRIEROOT.KeyIsExistInIndex(ctx, index, key)
 	if nil != err {
-		err = fmt.Errorf("KeyIsExistByIndex has err : %s", err.Error())
+		err = fmt.Errorf("KeyIsExistInIndex has err : %s", err.Error())
 		info := BuildErrResponse(ctx, nil, err)
 		ctx.JSON(http.StatusOK, info)
 		return
@@ -47,7 +47,7 @@ func HeliosGetDataByKey(ctx *gin.Context) {
 	}
 	data, err := resource.RESOURCE_TRIEROOT.GetDataByKey(ctx, index, key)
 	if nil != err {
-		err = fmt.Errorf("SearchOneKeyIsExist has err : %s", err.Error())
+		err = fmt.Errorf("GetDataByKey has err : %s", err.Error())
 		info := BuildErrResponse(ctx, nil, err)
 		ctx.JSON(http.StatusOK, info)
 		return
@@ -73,7 +73,7 @@ func HeliosSugQueryByIndexAndWord(ctx *gin.Context) {
 	list, err := resource.RESOURCE_TRIEROOT.SugQueryBySubWord(ctx, index, key, maxNum)
 
 	if nil != err {
-		fmt.Println(err.Error())
+		err = fmt.Errorf("SugQueryBySubWord has err : %s", err.Error())
 		info := BuildErrResponse(ctx, nil, err)
 		ctx.JSON(http.StatusOK, info)
 		return
@@ -101,7 +101,7 @@ func HeliosSugDataByIndexAndWord(ctx *gin.Context) {
 
 	sugData, err := resource.RESOURCE_TRIEROOT.SugDataListBySubWord(ctx, key, word, maxNum)
 	if nil != err {
-		fmt.Println(err.Error())
+		err = fmt.Errorf("SugDataListBySubWord has err: ", zap.Error(err))
 		info := BuildErrResponse(ctx, nil, err)
 		ctx.JSON(http.StatusOK, info)
 		return
