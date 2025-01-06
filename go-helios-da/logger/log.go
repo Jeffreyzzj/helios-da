@@ -1,4 +1,4 @@
-package helios_log
+package logger
 
 import "go.uber.org/zap"
 
