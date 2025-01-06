@@ -3,22 +3,20 @@ package app
 import (
 	"context"
 	"fmt"
+	"github.com/BurntSushi/toml"
 	"go-helios-da/config"
 	"go-helios-da/global"
 	"go-helios-da/resource"
-	"os"
-	"time"
-
-	"github.com/BurntSushi/toml"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"os"
+	"time"
 )
 
 func InitApp(ctx context.Context) {
 	initConf(ctx)
 
 	// 初始化业务日志
-	// todo 待完善
 	initLog(ctx)
 	// 初始化用户日志
 	initUserLog(ctx)
@@ -73,12 +71,12 @@ func initLog(ctx context.Context) {
 	}
 
 	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_APPEND|os.O_RDWR, os.ModePerm)
-	if err!= nil {
+	if err != nil {
 		// 处理文件打开错误
 		panic(err.Error())
 	}
 	errorFile, err := os.OpenFile(fileErrPath, os.O_CREATE|os.O_APPEND|os.O_RDWR, os.ModePerm)
-	if err!= nil {
+	if err != nil {
 		// 处理文件打开错误
 		panic(err.Error())
 	}
