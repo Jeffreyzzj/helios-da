@@ -3,6 +3,8 @@ package global
 // 日志文件
 var LOG_INFO_FILE = "./log/go_helios_da.log"
 
+var LOG_ERR_FILE = "./log/go_helios_da_err.log"
+
 var LOG_USER_INFO_FILE = "./log/go_helios_da_user.log"
 
 // 工程配置文件位置

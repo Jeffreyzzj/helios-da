@@ -17,9 +17,7 @@ func Router(ctx context.Context) {
 	root := gin.Default()
 	root.Use(Core())
 
-	root.Handle(http.MethodGet, "health", func(ctx *gin.Context) {
-		ctx.String(http.StatusOK, "ok")
-	})
+	root.Handle(http.MethodGet, "/health", controller.HeliosHealth)
 
 	helios := root.Group("/helios")
 	helios.Handle(http.MethodGet, "/hasKey", controller.HeliosHasKey)
@@ -31,6 +29,9 @@ func Router(ctx context.Context) {
 	lru.Handle(http.MethodGet, "/keyAll", controller.LRUKeyAll)
 	lru.Handle(http.MethodGet, "/get", controller.LRUGetData)
 	lru.Handle(http.MethodGet, "/put", controller.LRUPutData)
+
+	// 打印艺术字
+	artPrint()
 
 	if resource.RESOURCE_CONF.Port != "" {
 		root.Run(":" + resource.RESOURCE_CONF.Port)
@@ -96,3 +97,21 @@ func ClientPublicIP(r *http.Request) string {
 func HasLocalIPddr(ip string) bool {
 	return true
 }
+
+func artPrint() {
+	fmt.Println( "  _    _   ______   _        _____    ____     _____           _____              \n"+
+		" | |  | | |  ____| | |      |_   _|  / __ \\   / ____|         |  __ \\      /\\     \n"+
+		" | |__| | | |__    | |        | |   | |  | | | (___           | |  | |    /  \\    \n"+
+		" |  __  | |  __|   | |        | |   | |  | |  \\___ \\          | |  | |   / /\\ \\   \n"+
+		" | |  | | | |____  | |____   _| |_  | |__| |  ____) |    _    | |__| |  / ____ \\  \n"+
+		" |_|  |_| |______| |______| |_____|  \\____/  |_____/    (_)   |_____/  /_/    \\_\\ \n")
+}
+/*
+  _    _   ______   _        _____    ____     _____           _____
+ | |  | | |  ____| | |      |_   _|  / __ \   / ____|         |  __ \      /\
+ | |__| | | |__    | |        | |   | |  | | | (___           | |  | |    /  \
+ |  __  | |  __|   | |        | |   | |  | |  \___ \          | |  | |   / /\ \
+ | |  | | | |____  | |____   _| |_  | |__| |  ____) |    _    | |__| |  / ____ \
+ |_|  |_| |______| |______| |_____|  \____/  |_____/    (_)   |_____/  /_/    \_\
+
+*/

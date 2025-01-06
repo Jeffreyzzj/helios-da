@@ -6,7 +6,9 @@ import (
 	"github.com/BurntSushi/toml"
 	"go-helios-da/config"
 	"go-helios-da/global"
+	"go-helios-da/resource"
 	"go-helios-da/utils/lru"
+	"go.uber.org/zap"
 	"strings"
 )
 
@@ -27,7 +29,8 @@ func (t *TrieTreeUtil) TrieRootInit(ctx context.Context) (err error) {
 	for _, v := range indexConf.HeliosInitConfig.IndexConfigs {
 		err = buildIndexByIndexConf(ctx, v)
 		if nil != err {
-			fmt.Printf("BuildIndexByIndexConf key[%s] has err[%s] \n", v.Conf, err.Error())
+			err = fmt.Errorf("buildIndexByIndexConf key[%s] has err[%s] \n", v.Conf, err.Error())
+			resource.LOGGER.Error("buildIndexByIndexConf has err ", zap.Error(err))
 		}
 	}
 	return nil
@@ -75,7 +78,7 @@ func (t *TrieTreeUtil) KeyIsExistInIndex(ctx context.Context, index string, key 
 	node, err := getNodeByKey(ctx, index, []rune(key))
 	if nil != err {
 		err = fmt.Errorf("getNodeByKey key[%s] has err %s", key, err.Error())
-		return
+		return false, err
 	} else if node == nil {
 		return false, nil
 	}
@@ -102,7 +105,6 @@ func (t *TrieTreeUtil) SugQueryBySubWord(ctx context.Context, index, subQuery st
 	data, err := lru.GetLRUByKeyAndIndex(ctx, index, subQuery)
 	lruFlag := true
 	if nil != err {
-		//fmt.Printf("GetLRUByKeyAndIndex has err %s", err.Error())
 		// lru的err不应当影响sug
 		err, lruFlag = nil, false
 	} else if data != nil {
@@ -124,7 +126,7 @@ func (t *TrieTreeUtil) SugQueryBySubWord(ctx context.Context, index, subQuery st
 		// 保存lru
 		err = lru.PutLRUByKeyAndIndex(ctx, index, subQuery, sugList)
 		if nil != err {
-			fmt.Printf("PutLRUByKeyAndIndex %s", err.Error())
+			resource.LOGGER.Error("PutLRUByKeyAndIndex has err: ", zap.Error(err))
 		}
 	}
 	return list, nil
