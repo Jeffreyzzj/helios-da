@@ -6,7 +6,7 @@ import (
 	"github.com/BurntSushi/toml"
 	"go-helios-da/config"
 	"go-helios-da/global"
-	"go-helios-da/resource"
+	"go-helios-da/logger"
 	"go-helios-da/utils/lru"
 	"go.uber.org/zap"
 	"strings"
@@ -30,7 +30,7 @@ func (t *TrieTreeUtil) TrieRootInit(ctx context.Context) (err error) {
 		err = buildIndexByIndexConf(ctx, v)
 		if nil != err {
 			err = fmt.Errorf("buildIndexByIndexConf key[%s] has err[%s] \n", v.Conf, err.Error())
-			resource.LOGGER.Error("buildIndexByIndexConf has err ", zap.Error(err))
+			logger.LOGGER.Error("buildIndexByIndexConf has err ", zap.Error(err))
 		}
 	}
 	return nil
@@ -126,7 +126,7 @@ func (t *TrieTreeUtil) SugQueryBySubWord(ctx context.Context, index, subQuery st
 		// 保存lru
 		err = lru.PutLRUByKeyAndIndex(ctx, index, subQuery, sugList)
 		if nil != err {
-			resource.LOGGER.Error("PutLRUByKeyAndIndex has err: ", zap.Error(err))
+			logger.LOGGER.Error("PutLRUByKeyAndIndex has err: ", zap.Error(err))
 		}
 	}
 	return list, nil
