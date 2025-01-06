@@ -4,6 +4,7 @@ type TomlConfig struct {
 	Title            string
 	Port             string           `toml:"port"`
 	LogInfoPath      string           `toml:"log_level_info"`
+	LogErrPath       string           `toml:"log_level_err"`
 	HeliosInitConfig HeliosInitConfig `toml:"helios_init_config"`
 }
 
