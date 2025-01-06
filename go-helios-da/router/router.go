@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"go-helios-da/controller"
+	"go-helios-da/helios_log"
 	"go-helios-da/resource"
 	"net"
 	"net/http"
@@ -68,7 +69,7 @@ func HttpLogger() gin.HandlerFunc {
 
 		u := fmt.Sprintf(`|{"t":"%s", "ip":"%s", "fun":"%s", "q":"%s"}|`,
 			t, ip, path, query)
-		resource.LOGGER_USER.Info(u, ip)
+		helios_log.LOGGER_USER.Info(u, ip)
 		c.Next()
 	}
 }

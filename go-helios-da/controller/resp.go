@@ -2,7 +2,7 @@ package controller
 
 import (
 	"context"
-	"go-helios-da/resource"
+	"go-helios-da/helios_log"
 	"go.uber.org/zap"
 )
 
@@ -15,7 +15,7 @@ func BuildOkResponse(ctx context.Context, data interface{}) interface{} {
 }
 
 func BuildErrResponse(ctx context.Context, data interface{}, err error) interface{} {
-	resource.LOGGER.Error("EsBaseSearch has err：", zap.Error(err))
+	helios_log.LOGGER.Error("EsBaseSearch has err：", zap.Error(err))
 	return ResponseInfo{
 		Data: nil,
 		Code: 1,
