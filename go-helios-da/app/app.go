@@ -50,7 +50,7 @@ func initTrieTree(ctx context.Context) {
 			err := resource.RESOURCE_TRIEROOT.TrieRootInit(ctx)
 			if nil != err {
 				err = fmt.Errorf("TrieRootInit has err %s \n", err.Error())
-				logger.LOGGER.Error("TrieRootInit has err ", zap.Error(err))
+				logger.LOG.Error("TrieRootInit has err ", zap.Error(err))
 			}
 
 			time.Sleep(time.Duration(resource.RESOURCE_CONF.HeliosInitConfig.UpdateTime) * time.Hour)
@@ -91,7 +91,7 @@ func initLog(ctx context.Context) {
 	// 使用 zapcore.NewTee 将多个 Core 组合在一起
 	teeCore := zapcore.NewTee(infoCore, errorCore)
 	//core := zapcore.NewCore(encoder, sync, zapcore.InfoLevel)
-	logger.LOGGER = zap.New(teeCore).Sugar()
+	logger.LOG = zap.New(teeCore).Sugar()
 
 }
 
@@ -101,7 +101,7 @@ func initUserLog(ctx context.Context) {
 	file, _ := os.OpenFile(global.LOG_USER_INFO_FILE, os.O_CREATE|os.O_APPEND|os.O_RDWR, os.ModePerm)
 	sync := getWriteSync(file)
 	core := zapcore.NewCore(encoder, sync, zapcore.InfoLevel)
-	logger.LOGGER_USER = zap.New(core).Sugar()
+	logger.LOG_USER = zap.New(core).Sugar()
 
 }
 

@@ -15,7 +15,7 @@ func BuildOkResponse(ctx context.Context, data interface{}) interface{} {
 }
 
 func BuildErrResponse(ctx context.Context, data interface{}, err error) interface{} {
-	logger.LOGGER.Error("EsBaseSearch has err：", zap.Error(err))
+	logger.LOG.Error("EsBaseSearch has err：", zap.Error(err))
 	return ResponseInfo{
 		Data: nil,
 		Code: 1,

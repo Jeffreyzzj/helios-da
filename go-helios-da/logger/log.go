@@ -2,5 +2,5 @@ package logger
 
 import "go.uber.org/zap"
 
-var LOGGER *zap.SugaredLogger
-var LOGGER_USER *zap.SugaredLogger
+var LOG *zap.SugaredLogger
+var LOG_USER *zap.SugaredLogger
