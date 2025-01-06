@@ -30,7 +30,7 @@ func (t *TrieTreeUtil) TrieRootInit(ctx context.Context) (err error) {
 		err = buildIndexByIndexConf(ctx, v)
 		if nil != err {
 			err = fmt.Errorf("buildIndexByIndexConf key[%s] has err[%s] \n", v.Conf, err.Error())
-			logger.LOGGER.Error("buildIndexByIndexConf has err ", zap.Error(err))
+			logger.LOG.Error("buildIndexByIndexConf has err ", zap.Error(err))
 		}
 	}
 	return nil
@@ -126,7 +126,7 @@ func (t *TrieTreeUtil) SugQueryBySubWord(ctx context.Context, index, subQuery st
 		// 保存lru
 		err = lru.PutLRUByKeyAndIndex(ctx, index, subQuery, sugList)
 		if nil != err {
-			logger.LOGGER.Error("PutLRUByKeyAndIndex has err: ", zap.Error(err))
+			logger.LOG.Error("PutLRUByKeyAndIndex has err: ", zap.Error(err))
 		}
 	}
 	return list, nil

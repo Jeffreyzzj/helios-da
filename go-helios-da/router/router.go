@@ -69,7 +69,7 @@ func HttpLogger() gin.HandlerFunc {
 
 		u := fmt.Sprintf(`|{"t":"%s", "ip":"%s", "fun":"%s", "q":"%s"}|`,
 			t, ip, path, query)
-		logger.LOGGER_USER.Info(u, ip)
+		logger.LOG_USER.Info(u, ip)
 		c.Next()
 	}
 }
