@@ -53,7 +53,7 @@ func initTrieTree(ctx context.Context) {
 				logger.LOG.Error("TrieRootInit has err ", zap.Error(err))
 			}
 
-			time.Sleep(time.Duration(resource.RESOURCE_CONF.HeliosInitConfig.UpdateTime) * time.Hour)
+			time.Sleep(time.Duration(resource.RESOURCE_CONF.HeliosInitConfig.UpdateTime) * time.Second)
 		}
 	}()
 }

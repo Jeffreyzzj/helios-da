@@ -29,8 +29,23 @@
 ## 使用
 1. 配置helios-da，配置文件在根目录：
   > ./da_conf/helios_da_conf.toml
+  > title = "helios-root" #项目名称，
+  > port = "10010" #项目启动端口
+  > log_level_info = "./log/go_helios_da.log" #日志文件
+  > log_level_err = "./log/go_helios_da_err.log" #错误日志文件
+  > [helios_init_config] #初始化配置参数
+  >     title = "helios_init_conf" #初始化配置参数名称
+  >     update_time = 300 #自动更新索引时间，单位：秒
+  > [helios_init_config.index_conf] #各个索引文件
+  >   [helios_init_config.index_conf.music] #名称为【音乐】的搜索索引
+  >         conf = "./da_conf/search/music_download.conf" #【音乐】索引的特性化配置文件
+  >         data_conf = "./da_conf/search/music_download_data.conf" #【音乐】索引的数据配置文件
+  >     [helios_init_config.index_conf.test] #名称为【测试】的搜索索引
+  >         conf = "./da_conf/search/test_t.conf" #【测试】索引的特性化配置文件
+  >         data_conf = "./da_conf/search/test_t_data.conf" #【测试】索引的数据配置文件
+
 2. 添加自己服务的相关内容，建议放在：./da_conf/search/
-3. 配置文件包括两部分
+3. 配置搜索文件包括两部分
    + 索引配置文件 
    ```toml
         # 倒排索引index主键
