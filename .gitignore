@@ -1,5 +1,7 @@
 .idea
+.vscode
 go-helios-da/.idea
+go-helios-da/.vscode
 go-helios-da/helios-da-linux
 go-helios-da/helios-da-windows.exe
 go-helios-da/helios-da-macos
