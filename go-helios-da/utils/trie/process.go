@@ -195,10 +195,11 @@ func formatTrieTreeV2(ctx context.Context, formatType string, indexInfo IndexNee
 	miniIndexs := map[string][]interface{}{}
 	switch formatType {
 	case global.INDEX_FORMAT_JSON:
-		for _, v := range indexInfo.DataMaps {
+		for k, v := range indexInfo.DataMaps {
 			if v == nil {
 				break
 			}
+			dataK := indexInfo.DataMaps[k]
 			for _, miniList := range indexInfo.Mini {
 				miniMidList := []interface{}{}
 				for _, m := range miniList {
@@ -219,8 +220,8 @@ func formatTrieTreeV2(ctx context.Context, formatType string, indexInfo IndexNee
 
 					miniMmidList := []interface{}{}
 					for _, dataMid := range miniMidList {
-						for _, v := range dataList {
-							vvMid := fmt.Sprintf("%s%s", dataMid, v)
+						for _, vvv := range dataList {
+							vvMid := fmt.Sprintf("%s%s", dataMid, vvv)
 							miniMmidList = append(miniMmidList, vvMid)
 						}
 					}
@@ -228,7 +229,7 @@ func formatTrieTreeV2(ctx context.Context, formatType string, indexInfo IndexNee
 				}
 				for _, miniMid := range miniMidList {
 					miniKey := fmt.Sprintf("%v", miniMid)
-					miniIndexs[miniKey] = append(miniIndexs[miniKey], &v)
+					miniIndexs[miniKey] = append(miniIndexs[miniKey], &dataK)
 				}
 			}
 		}
