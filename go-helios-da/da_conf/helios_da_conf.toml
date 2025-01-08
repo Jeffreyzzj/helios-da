@@ -4,7 +4,7 @@ log_level_info = "./log/go_helios_da.log"
 log_level_err = "./log/go_helios_da_err.log"
 [helios_init_config]
     title = "helios_init_conf"
-    update_time = 5
+    update_time = 300
 [helios_init_config.index_conf]
     [helios_init_config.index_conf.music]
         conf = "./da_conf/search/music_download.conf"
